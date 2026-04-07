@@ -382,37 +382,6 @@ def load_peft_model(model, peft_path: str):
     return model
 
 
-def test_train():
-    # Example usage using emo dataset
-    dataset = load_dataset("emo")
-    label_map = {0: "others", 1: "happy", 2: "sad", 3: "angry"}
-    dataset = dataset.map(lambda e: {"x": e["text"], "y": label_map[e["label"]]})
-    train_set = dataset["train"]
-    test_set = dataset["test"]
-
-    model_name = "t5-small"
-    model_type = "ConditionalGeneration"
-    model, tokenizer = initialize_text_to_text_model(model_name, model_type)
-
-    model = train_text_to_text_model(
-        train_set,
-        test_set,
-        model,
-        tokenizer,
-        model_type,
-        num_train_epochs=1,
-        per_device_batch_size=64,
-        real_batch_size=64,
-    )
-    # Use the model for inference in the testset, print the first 10 examples
-    for i in range(10):
-        print("Input:", test_set[i]["x"])
-        print("Target:", test_set[i]["y"])
-        print(
-            "Prediction:",
-            model_inference(model, tokenizer, test_set[i]["x"], model_type),
-        )
-        print()
 
 def test_qwen_alpaca():
     model_name = "/home/fymeng/modelQwen2.5-7B"
@@ -431,8 +400,8 @@ def test_qwen_alpaca():
         print()
 
 def merge_qwen(peft_path):
-    model_name = "/home/fymeng/modelQwen2.5-7B"
-    model_type = "CausalLM"
+    model_name = ""
+    model_type = ""
     model, tokenizer = initialize_text_to_text_model(model_name, model_type, True)
     model = load_peft_model(model, peft_path)
     print("Save model to ", os.path.join(peft_path, "merged_checkpoint"))
@@ -441,5 +410,4 @@ def merge_qwen(peft_path):
     del model, tokenizer
 
 if __name__ == "__main__":
-    merge_qwen("results/qwen")
-    # merge_qwen("results/qwen-alpaca_alpaca/gradient-ArB2r-adam/0")
+    merge_qwen("")
