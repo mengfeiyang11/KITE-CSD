@@ -40,36 +40,30 @@ def load_predictions(path):
     pred_labels = []
     
     with open(path, 'r', encoding='utf-8') as f:
-        # 使用 enumerate 追踪行号，start=1 表示从第 1 行开始计数
         for line_num, line in enumerate(f, start=1):
             line = line.strip()
             if not line:
-                continue # 跳过空行
+                continue 
                 
             try:
                 item = json.loads(line)
                 
-                # 安全获取字段，防止因为缺少 key 报错
                 pred_raw = item.get("predict")
                 gold_raw = item.get("label")
                 
                 if pred_raw is None or gold_raw is None:
-                    print(f"[格式错误] 第 {line_num} 行: 缺少 'predict' 或 'label' 字段。数据内容: {line}")
                     continue
                     
                 pred = str(pred_raw).strip()
                 gold = str(gold_raw).strip()
 
-                # 检查标签是否在映射表中
                 if pred not in label_map or gold not in label_map:
-                    print(f"[数值异常] 第 {line_num} 行: 标签不在允许范围内 (predict='{pred}', label='{gold}')。数据内容: {line}")
-                    continue  # 跳过异常项
+                    continue 
                     
                 pred_labels.append(label_map[pred])
                 true_labels.append(label_map[gold])
                 
             except json.JSONDecodeError:
-                print(f"[JSON解析失败] 第 {line_num} 行: 无法解析为 JSON 格式。数据内容: {line}")
                 continue
                 
     return true_labels, pred_labels
